@@ -33,6 +33,46 @@ Built with a premium **Glassmorphism UI** using Streamlit, the application provi
 
 ---
 
+## 🏗️ System Architecture
+
+```mermaid
+graph TD
+    A[User UI - Streamlit] -->|Upload Document| B(Document Processing)
+    
+    subgraph "OCR Pipeline"
+        B -->|PDF| C[PyMuPDF / pdfplumber]
+        B -->|Image| D[OpenCV Preprocessing]
+        D --> E[PaddleOCR]
+        C --> F{Extracted Text}
+        E --> F
+    end
+
+    subgraph "LangGraph Multi-Agent Workflow"
+        F --> G[Summary Agent]
+        G --> H[Diagnosis Agent]
+        H --> I[Insurance Agent]
+        I --> J[Coding Agent]
+    end
+    
+    subgraph "RAG Chatbot Pipeline"
+        F --> K[Text Splitter]
+        K --> L[HuggingFace Embeddings]
+        L --> M[(ChromaDB Vector Store)]
+        M -->|Retrieved Context| N[Groq LLaMA-3.3]
+        A -->|User Query| N
+        N -->|Detailed Response| A
+    end
+
+    subgraph "Data & Analytics"
+        J --> O[processing_history.json]
+        O --> P[Live Plotly Dashboard]
+    end
+    
+    A --> P
+```
+
+---
+
 ## 🛠️ Technology Stack
 
 | Component | Technology |
