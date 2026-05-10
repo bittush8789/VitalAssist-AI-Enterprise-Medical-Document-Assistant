@@ -1,10 +1,12 @@
 // UI Navigation
-function switchView(viewId) {
+function switchView(viewId, element) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
     
-    document.getElementById(viewId).classList.add('active');
-    event.currentTarget.classList.add('active');
+    const targetView = document.getElementById(viewId);
+    if (targetView) targetView.classList.add('active');
+    
+    if (element) element.classList.add('active');
 }
 
 // Chart.js Initialization for Analytics
