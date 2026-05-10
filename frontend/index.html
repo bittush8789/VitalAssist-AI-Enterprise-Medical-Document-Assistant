@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VitalAssist AI | Enterprise Medical Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #F8FAFC 0%, #EFF6FF 100%);
+            color: #1E293B;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.05);
+        }
+        .sidebar {
+            width: 260px;
+            background: #0F172A;
+            color: white;
+            transition: all 0.3s;
+        }
+        .nav-item {
+            padding: 12px 20px;
+            margin: 4px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #94A3B8;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: #3B82F6;
+            color: white;
+        }
+        .view-section { display: none; }
+        .view-section.active { display: block; }
+        .chat-container { height: calc(100vh - 200px); overflow-y: auto; }
+        .chat-bubble { max-width: 80%; padding: 12px 18px; border-radius: 16px; margin-bottom: 12px; }
+        .chat-user { background: #3B82F6; color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+        .chat-ai { background: white; color: #1E293B; border: 1px solid #E2E8F0; margin-right: auto; border-bottom-left-radius: 4px; }
+        
+        /* Typing animation */
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px; height: 8px;
+            background-color: #94A3B8;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="flex">
+
+    <!-- Sidebar -->
+    <div class="sidebar h-full flex flex-col py-6 shadow-xl z-20 shrink-0">
+        <div class="px-6 mb-8 text-center">
+            <h1 class="text-2xl font-bold text-white tracking-wide"><i class="fa-solid fa-staff-snake text-blue-400 mr-2"></i>VitalAssist</h1>
+            <p class="text-xs text-slate-400 mt-1">Enterprise AI Platform</p>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto">
+            <div class="nav-item active" onclick="switchView('dashboard')"><i class="fa-solid fa-chart-pie w-6"></i> Dashboard</div>
+            <div class="nav-item" onclick="switchView('processing')"><i class="fa-solid fa-file-medical w-6"></i> Document Processing</div>
+            <div class="nav-item" onclick="switchView('rag')"><i class="fa-solid fa-robot w-6"></i> RAG Chatbot</div>
+            <div class="nav-item" onclick="switchView('diagnosis')"><i class="fa-solid fa-stethoscope w-6"></i> Diagnosis Extraction</div>
+            <div class="nav-item" onclick="switchView('analytics')"><i class="fa-solid fa-chart-line w-6"></i> Analytics</div>
+        </div>
+        
+        <div class="mt-auto pt-4 border-t border-slate-800">
+            <div class="nav-item"><i class="fa-solid fa-gear w-6"></i> Settings</div>
+            <div class="nav-item text-red-400 hover:bg-red-500"><i class="fa-solid fa-right-from-bracket w-6"></i> Logout</div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 h-full overflow-y-auto p-8">
+        
+        <!-- Dashboard View -->
+        <div id="dashboard" class="view-section active animate-fade-in">
+            <h2 class="text-3xl font-bold mb-2">Medical Intelligence Center</h2>
+            <p class="text-slate-500 mb-8">Real-time clinical insights and document automation</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="glass-panel rounded-2xl p-6 text-center">
+                    <p class="text-slate-500 text-sm font-semibold uppercase">Total Reports</p>
+                    <p class="text-4xl font-bold text-blue-600 mt-2">1,248</p>
+                </div>
+                <div class="glass-panel rounded-2xl p-6 text-center">
+                    <p class="text-slate-500 text-sm font-semibold uppercase">Avg Processing Time</p>
+                    <p class="text-4xl font-bold text-blue-600 mt-2">1.4s</p>
+                </div>
+                <div class="glass-panel rounded-2xl p-6 text-center">
+                    <p class="text-slate-500 text-sm font-semibold uppercase">Unique Diagnoses</p>
+                    <p class="text-4xl font-bold text-blue-600 mt-2">342</p>
+                </div>
+                <div class="glass-panel rounded-2xl p-6 text-center">
+                    <p class="text-slate-500 text-sm font-semibold uppercase">AI Confidence</p>
+                    <p class="text-4xl font-bold text-blue-600 mt-2">99.1%</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="glass-panel rounded-2xl p-6 lg:col-span-2">
+                    <h3 class="font-bold text-lg mb-4">Recent Activity</h3>
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="text-slate-500 border-b border-slate-200">
+                                <th class="pb-3">Time</th>
+                                <th class="pb-3">Document</th>
+                                <th class="pb-3">Status</th>
+                                <th class="pb-3">Agent</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="border-b border-slate-100">
+                                <td class="py-4">10:45 AM</td>
+                                <td class="font-medium text-blue-600">patient_report_774.pdf</td>
+                                <td><span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-bold">Completed</span></td>
+                                <td>Multi-Agent</td>
+                            </tr>
+                            <tr class="border-b border-slate-100">
+                                <td class="py-4">09:30 AM</td>
+                                <td class="font-medium text-blue-600">lab_results_smith.jpg</td>
+                                <td><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-bold">Processing</span></td>
+                                <td>OCR Extraction</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-bold text-lg mb-4">System Alerts</h3>
+                    <div class="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-3 text-sm">
+                        <p class="font-bold text-blue-800">Model Updated</p>
+                        <p class="text-blue-600">Llama 3.3 70B Versatile is now active.</p>
+                    </div>
+                    <div class="bg-green-50 border border-green-100 rounded-lg p-4 text-sm">
+                        <p class="font-bold text-green-800">ChromaDB Synced</p>
+                        <p class="text-green-600">Vector store optimized successfully.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Processing View -->
+        <div id="processing" class="view-section animate-fade-in">
+            <h2 class="text-3xl font-bold mb-2">Document Processing</h2>
+            <p class="text-slate-500 mb-8">Upload medical records for AI extraction</p>
+            
+            <div class="glass-panel rounded-2xl p-8 text-center border-dashed border-2 border-slate-300 hover:border-blue-500 transition-colors mb-6" id="drop-zone">
+                <i class="fa-solid fa-cloud-arrow-up text-5xl text-blue-500 mb-4"></i>
+                <h3 class="font-bold text-xl mb-2">Drag & Drop Documents</h3>
+                <p class="text-slate-500 mb-4">Supports PDF, PNG, JPG</p>
+                <input type="file" id="fileInput" class="hidden" accept=".pdf,image/*">
+                <button onclick="document.getElementById('fileInput').click()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Browse Files</button>
+            </div>
+            
+            <div id="processing-status" class="hidden">
+                <div class="glass-panel rounded-2xl p-6 mb-6">
+                    <h3 class="font-bold mb-4 flex items-center"><i class="fa-solid fa-spinner fa-spin mr-2 text-blue-500"></i> AI Processing Pipeline</h3>
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 mb-2">
+                        <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+                    </div>
+                    <p class="text-sm text-slate-500 text-right">Running OCR Agent...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- RAG Chatbot View -->
+        <div id="rag" class="view-section animate-fade-in h-full flex flex-col">
+            <div class="flex justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold mb-1">Medical RAG Assistant</h2>
+                    <p class="text-slate-500">Chat with your clinical documents</p>
+                </div>
+                <button class="text-red-500 hover:bg-red-50 px-4 py-2 rounded-lg border border-red-200 text-sm font-semibold transition"><i class="fa-solid fa-trash-can mr-2"></i>Clear Chat</button>
+            </div>
+            
+            <div class="glass-panel rounded-2xl p-6 flex-1 flex flex-col relative">
+                <div class="chat-container pr-4 mb-4 flex-1" id="chat-history">
+                    <div class="text-center text-slate-400 text-sm my-4">Today</div>
+                    <div class="chat-bubble chat-ai">
+                        Hello! I am VitalAssist, your enterprise medical AI. I have ingested the latest patient report. How can I help you today?
+                    </div>
+                </div>
+                
+                <div class="relative mt-auto">
+                    <input type="text" id="chat-input" class="w-full pl-6 pr-16 py-4 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm" placeholder="Ask about diagnosis, medications, or patient history...">
+                    <button onclick="sendMessage()" class="absolute right-2 top-2 bg-blue-600 text-white w-10 h-10 rounded-lg flex items-center justify-center hover:bg-blue-700 transition">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics View -->
+        <div id="analytics" class="view-section animate-fade-in">
+            <h2 class="text-3xl font-bold mb-2">Healthcare Analytics</h2>
+            <p class="text-slate-500 mb-8">Visual insights from document data</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-bold mb-4 text-center">Top Diagnoses</h3>
+                    <canvas id="diagnosisChart" height="250"></canvas>
+                </div>
+                <div class="glass-panel rounded-2xl p-6">
+                    <h3 class="font-bold mb-4 text-center">Processing Volume (Monthly)</h3>
+                    <canvas id="volumeChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
